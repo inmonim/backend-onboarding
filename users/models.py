@@ -9,3 +9,6 @@ class User(BaseModel):
     nickname = models.CharField(max_length=50, null=False)
     username = models.CharField(max_length=50, null=False)
     password = models.CharField(max_length=255, null=False)
+    
+    class Meta:
+        db_table = 'users'

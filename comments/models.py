@@ -13,5 +13,9 @@ class Comment(BaseModel):
                                 null=False
                                 )
     author = models.ForeignKey('users.User',
+                               null=True,
                                on_delete=models.SET_NULL,
                                related_name='comments')
+    
+    class Meta:
+        db_table = "comments"

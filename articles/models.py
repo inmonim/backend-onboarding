@@ -15,12 +15,15 @@ class Category(BaseModel):
                                blank=True,
                                related_name='children'
                                )
-    create_user = models.ForeignKey('Users.user',
+    create_user = models.ForeignKey('users.User',
                                     on_delete=models.DO_NOTHING,
                                     null=True,
                                     blank=True,
                                     related_name='created_category'
                                     )
+    
+    class Meta:
+        db_table = 'categories'
     
     
 class Article(BaseModel):
@@ -31,4 +34,10 @@ class Article(BaseModel):
     is_public = models.SmallIntegerField(null=False, default=1)
     is_deleted = models.SmallIntegerField(null=False, default=0)
     
-    category = models.ForeignKey(Category, null=True, related_name='articles')
+    category = models.ForeignKey(Category,
+                                 on_delete=models.SET_NULL,
+                                 null=True,
+                                 related_name='articles')
+    
+    class Meta:
+        db_table = 'articles'
