@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'users',
     'articles',
     'comments',
+    'common',
    
  
     'django.contrib.admin',
