@@ -15,7 +15,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Load enviroments
 load_dotenv(BASE_DIR / '.env')
@@ -25,15 +25,6 @@ load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-%@%#&)k60^5z2q+1ki)-+)kj=5u$+!5!_bu72(4q2q)iaei&$5'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    ]
-
 
 # Application definition
 
@@ -85,17 +76,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME' : os.getenv('DB_SCHEMA'),
-        'USER' : os.getenv('DB_USERNAME'),
-        'PASSWORD' : os.getenv('DB_PASSWORD'),
-        'HOST' : os.getenv('DB_HOST'),
-        'PORT' : '5432',
-    }
-}
 
 
 # Password validation
