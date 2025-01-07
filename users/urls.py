@@ -6,5 +6,5 @@ app_name = "users"
 
 urlpatterns = [
     path("", user_view_api),
-    path("<int:pk>", user_detail_view_api),
+    path("<int:user_id>", user_detail_view_api),
 ]
