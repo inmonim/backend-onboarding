@@ -1,8 +1,7 @@
 from django.urls import path
-from .views import CommentViewSet
+from .views import comment, comment_detail
 
 urlpatterns = [
-    path('<int:pk>/', CommentViewSet.as_view({
-        'get' : 'retrieve'
-        }))
+    path('', comment),
+    path('<int:comment_id>', comment_detail)
 ]
