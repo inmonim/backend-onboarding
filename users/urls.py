@@ -1,16 +1,10 @@
 from django.urls import path, include
 
-from users.views import UserViewSet
+from users.views import user_view_api, user_detail_view_api
 
 app_name = "users"
 
 urlpatterns = [
-    path("/", UserViewSet.as_view({
-        "get": "list",
-        "post": "create",
-        })),
-    
-    path("<int:pk>/", UserViewSet.as_view({
-        "get": "retrieve",
-        })),
+    path("", user_view_api),
+    path("<int:pk>", user_detail_view_api),
 ]

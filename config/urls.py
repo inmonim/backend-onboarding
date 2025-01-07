@@ -22,5 +22,5 @@ urlpatterns = [
     
     path('users', include("users.urls")),
     path('articles', include("articles.urls")),
-    path('comments', include("comments.urls")),
+    path('articles/<int:article_id>/comments', include("comments.urls")),
 ]
