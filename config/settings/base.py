@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -34,6 +35,8 @@ INSTALLED_APPS = [
     'comments',
     'common',
    
+    'rest_framework',
+    'rest_framework_simplejwt',
  
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +55,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Access token 유효기간
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Refresh token 유효기간
+}
 
 ROOT_URLCONF = 'config.urls'
 

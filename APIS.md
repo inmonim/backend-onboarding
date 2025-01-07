@@ -75,6 +75,8 @@
     - password : string, max(50), require
   
 - response:
+  - user_id : int
+  - nickname : string
   - access_token : string
   - refresh_token : string
 
