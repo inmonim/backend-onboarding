@@ -44,7 +44,7 @@ class Category(BaseModel):
             return self.convert_to_model_instances(rows)
 
 
-    def get_child_categories(self, category_id):
+    def get_child_categories(self,):
         query = """
             WITH RECURSIVE child_tree AS (
                 SELECT category_id, category_name, parent_id, is_public, created_user_id
@@ -58,7 +58,7 @@ class Category(BaseModel):
             SELECT * FROM child_tree;
         """
         with connection.cursor() as cursor:
-            cursor.execute(query, [category_id])
+            cursor.execute(query, [self.category_id])
             rows = cursor.fetchall()
             return self.convert_to_model_instances(rows)
     
