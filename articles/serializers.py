@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
 from users.serializers import UserSerializer
-from .models import Article
+from .models import Article, Category
 
 class ArticleSerializer(ModelSerializer):
     author = UserSerializer()
@@ -18,3 +18,18 @@ class ArticleSerializer(ModelSerializer):
             'updated_at',
             'category_id',
         )
+        
+class CategorySerializer(ModelSerializer):
+    
+    class Meta:
+        model = Category
+        fields = (
+            'category_id',
+            'category_name',
+            'is_public',
+            'created_user',
+            'parent',
+        )
+        extra_kwargs = {
+            "created_user" : {"read_only" : True}
+        }
