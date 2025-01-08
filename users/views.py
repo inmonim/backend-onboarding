@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
 
@@ -18,6 +18,7 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, 200)
     
+    
 class LogoutView(APIView):
     def post(self, request):
         try:
@@ -29,6 +30,7 @@ class LogoutView(APIView):
         except Exception as e:
             return Response('유효하지 않은 토큰', 401)
 
+
 user_view_set = UserViewSet.as_view({
     "get": "list",
     "post": "create",
@@ -38,4 +40,14 @@ user_detail_view_set = UserViewSet.as_view({
     "get": "retrieve",
 })
 
-login_view_set = LoginView.as_view()
+login_view = LoginView.as_view()
+
+logout_view = LogoutView.as_view()
+
+refresh_view = TokenRefreshView.as_view()
+
+class ProtectView(APIView):
+    permission_classes = [IsAuthenticated]    
+    def get(self, request):
+        return Response("토큰 검증 성공", 200)
+protect_view = ProtectView.as_view()
