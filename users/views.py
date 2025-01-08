@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
 from .models import User
 from .serializers import UserSerializer, UserPasswordChagneSerializer, LoginSerializer, UserProfileUpdateSerializer
 
@@ -50,16 +50,15 @@ class LoginView(APIView):
         return Response(serializer.validated_data, 200)
     
     
-class LogoutView(APIView):
-    def post(self, request):
-        try:
-            refresh_token = request.data['refresh']
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-
-            return Response('유효하지 않은 토큰', 401)
-        except Exception as e:
-            return Response('유효하지 않은 토큰', 401)
+# class LogoutView(APIView):
+#     def post(self, request):
+#         try:
+#             refresh_token = request.data['refresh']
+#             token = RefreshToken(refresh_token)
+#             token.blacklist()
+#             return Response('유효하지 않은 토큰', 401)
+#         except Exception as e:
+#             return Response('유효하지 않은 토큰', 401)
 
 
 user_view_set = UserViewSet.as_view({
@@ -75,7 +74,7 @@ user_password_change_view_set = UserPasswordChangeViewSet.as_view({
 
 login_view = LoginView.as_view()
 
-logout_view = LogoutView.as_view()
+logout_view = TokenBlacklistView.as_view()
 
 refresh_view = TokenRefreshView.as_view()
 
