@@ -37,6 +37,7 @@ INSTALLED_APPS = [
    
     'rest_framework',
     'rest_framework_simplejwt',
+    # 'rest_framework_simplejwt.token_blacklist',
  
     'django.contrib.admin',
     'django.contrib.auth',
@@ -62,11 +63,13 @@ REST_FRAMEWORK = {
     ),
 }
 
-
+AUTH_USER_MODEL = 'users.User'
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Access token 유효기간
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Refresh token 유효기간
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'BLACKLIST_AFTER_ROTATION' : True,
 }
 
 ROOT_URLCONF = 'config.urls'

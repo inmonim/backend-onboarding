@@ -27,23 +27,24 @@ class LoginSerializer(TokenObtainPairSerializer):
     password = serializers.CharField(write_only=True)
     refresh_token = serializers.CharField(read_only=True)
     access_token = serializers.CharField(read_only=True)
+    
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        return token
 
     def validate(self, data):
         username = data.get('username')
         password = data.get('password')
 
-        # 사용자 확인
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
 
-        # 비밀번호 확인
         if not check_password(password, user.password):
             raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
 
-        # JWT 토큰 생성
-        user.id = user.user_id
         refresh = RefreshToken.for_user(user)
         data['refresh_token'] = str(refresh)
         data['access_token'] = str(refresh.access_token)
