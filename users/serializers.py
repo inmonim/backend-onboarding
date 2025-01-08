@@ -1,3 +1,6 @@
+from datetime import datetime
+import pytz
+
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.hashers import make_password, check_password
@@ -5,11 +8,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
+tz = pytz.timezone('UTC')
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['nickname', 'username', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['nickname', 'username', 'password', 'last_login']
+        extra_kwargs = {
+            'username': {'write_only': True},
+            'password': {'write_only': True},
+            'last_login': {'read_only': True}}
 
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
@@ -20,6 +28,38 @@ class UserSerializer(serializers.ModelSerializer):
         self.validate_username(data)
         data['password'] = make_password(data['password'])
         return super().create(data)
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['nickname']
+        
+    def update(self, instance, validated_data):
+        validated_data.pop('username', None)
+        validated_data.pop('password', None)
+        
+        instance.nickname = validated_data.get('nickname', instance.nickname)
+        instance.save()
+        return instance
+
+class UserPasswordChagneSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password'] 
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data['new_password'])
+        instance.save()
+        return instance
 
 class LoginSerializer(TokenObtainPairSerializer):
         
@@ -44,8 +84,16 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         if not check_password(password, user.password):
             raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
-
+        
         refresh = RefreshToken.for_user(user)
-        data['refresh_token'] = str(refresh)
-        data['access_token'] = str(refresh.access_token)
-        return data
+        
+        res = {
+            'refresh_token' : str(refresh),
+            'access_token' : str(refresh.access_token),
+            'nickname' : user.nickname,
+        }
+        
+        user.last_login = datetime.now(tz=tz)
+        user.save()
+        
+        return res
