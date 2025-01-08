@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.hashers import make_password, check_password
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 
@@ -22,16 +23,28 @@ class UserSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(TokenObtainPairSerializer):
         
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-    
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+    refresh_token = serializers.CharField(read_only=True)
+    access_token = serializers.CharField(read_only=True)
+
     def validate(self, data):
-        username, password = data['username'], data['password']
-        user = User.objects.filter(username=username)
-        if user:
-            if not check_password(password, user[0].password):
-                raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
-        else:
+        username = data.get('username')
+        password = data.get('password')
+
+        # 사용자 확인
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
             raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
-        return user[0]
+
+        # 비밀번호 확인
+        if not check_password(password, user.password):
+            raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
+
+        # JWT 토큰 생성
+        user.id = user.user_id
+        refresh = RefreshToken.for_user(user)
+        data['refresh_token'] = str(refresh)
+        data['access_token'] = str(refresh.access_token)
+        return data
