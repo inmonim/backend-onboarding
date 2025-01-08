@@ -90,4 +90,6 @@ db.sqlite3
 
 .idea
 
+# mypy
 .mypy_cache
+mypy.ini

@@ -36,6 +36,8 @@ class CategoryViewSet(ModelViewSet):
             - type에 따라 현재 카테고리 자신 또는 부모/자식 카테고리 목록 반환
         """
         query_type = request.query_params.get('type')
+        if not kwargs.get('pk'):
+            return Response("데이터가 없습니다", 404)
         category = self.get_object()
         many = query_type in ['parents', 'children']
         if query_type == 'parents':
@@ -44,6 +46,24 @@ class CategoryViewSet(ModelViewSet):
             category = category.get_child_categories()
         serializer = self.get_serializer(category, many=many)
         return Response(serializer.data, 200)
+    
+    def perform_destroy(self, instance):
+        
+        if instance.created_user != self.request.user:
+            return Response("삭제 권한이 없습니다.", 403)
+        
+        children = Category.objects.filter(parent_id=instance.category_id)
+        parent = instance.parent
+        
+        for child in children:
+            child.parent = parent
+            child.save()
+        
+        instance.delete()
+        # return super().perform_destroy(instance)
+
+
+
 
 article_list = ArticleViewSet.as_view({
     'get' : 'list'
@@ -56,4 +76,5 @@ aritcle_detail = ArticleViewSet.as_view({
 category_view_set = CategoryViewSet.as_view({
     'post' : 'create',
     'get' : 'retrieve',
+    'delete' : 'destroy'
 })
