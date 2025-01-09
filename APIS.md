@@ -245,14 +245,39 @@
   - 409:
     - (공개된 카테고리 중에서) 카테고리명이 중복됨
 
-6. 카테고리 조회 (필요할까??)
+6. 카테고리 조회
+
+> 쿼리 파라미터에 따라 조회하는 값이 달라짐
+- type=null(parents, children 이외의 모든 잘못된 값을 포함)인 경우 해당 id 카테고리 조회
+- parents의 경우, 해당 카테고리와 모든 부모 카테고리를 조회
+  - 게시글에서 계층을 표시할 때 사용
+- children의 경우, 해당 카테고리와 모든 자식 카테고리를 조회
+  - 카테고리를 활용한 검색에서 해당 카테고리의 자식 카테고리의 게시물을 조회하기 위해 사용 (생각해보니 게시물 검색에서 해당 sql문을 써서 조회하는 걸로 바꿔도 될 것 같습니다.)
 
 - endpoint = `category/<pk:int>`
 - method = `get`
 - success code = 200
 
 - request:
-  - 
+  - path params:
+    - category_id(pk)
+  - query params:
+    - type=[null, parents, children]
+
+- response:
+  - list[{
+    category_id : int
+    category_name : string
+    is_public : int
+    created_user : int
+    parent : int
+  }]
+  OR
+  - category_id : int
+  - category_name : string
+  - is_public : int
+  - created_user : int
+  - parent : int
 
 7. 카테고리 삭제
 

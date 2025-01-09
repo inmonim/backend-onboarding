@@ -1,7 +1,9 @@
+from typing import TypeVar
 from django.db import models, connection
 
 from common.models import BaseModel
 
+T = TypeVar('T', bound="Category")
 
 class Category(BaseModel):
     
@@ -25,7 +27,19 @@ class Category(BaseModel):
     class Meta:
         db_table = 'categories'
 
-    def get_parent_categories(self):
+    def get_parent_categories(self) -> tuple[T]:
+        """
+        특정 카테고리의 모든 상위 카테고리를 검색하여 반환합니다.
+        Django ORM을 통해 재귀적으로 쿼리를 보내는 것보다, 네이티브 쿼리를 활용하는 것이 네트워크 I/O를 줄일 수 있습니다.
+        
+        호출한 인스턴스 객체의 정보를 토대로 쿼리를 실행하므로, 인자가 필요없습니다.
+        
+        - Args:
+            - None
+            
+        - Return:
+            - List[Category]
+        """
         query = """
             WITH RECURSIVE parent_tree AS (
                 SELECT category_id, category_name, parent_id, is_public, created_user_id
@@ -43,8 +57,7 @@ class Category(BaseModel):
             rows = cursor.fetchall()
             return self.convert_to_model_instances(rows)
 
-
-    def get_child_categories(self,):
+    def get_child_categories(self) -> tuple[T]:
         query = """
             WITH RECURSIVE child_tree AS (
                 SELECT category_id, category_name, parent_id, is_public, created_user_id
@@ -62,8 +75,16 @@ class Category(BaseModel):
             rows = cursor.fetchall()
             return self.convert_to_model_instances(rows)
     
-    
-    def convert_to_model_instances(self, raw_data):
+    def convert_to_model_instances(self, raw_data : tuple[dict]) -> list[T]:
+        """
+        native query로 반환받은 tuple[dict] 형태의 객체를 Category 인스턴스로 변환하여 반환합니다.
+        
+        - Args:
+            tuple[dict]
+        
+        - Return:
+            list[Category]
+        """
         instances = []
         for row in raw_data:
             instance = Category(

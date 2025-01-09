@@ -38,7 +38,7 @@ class CategoryViewSet(ModelViewSet):
         query_type = request.query_params.get('type')
         if not kwargs.get('pk'):
             return Response("데이터가 없습니다", 404)
-        category = self.get_object()
+        category : Category = self.get_object()
         many = query_type in ['parents', 'children']
         if query_type == 'parents':
             category = category.get_parent_categories()
@@ -48,7 +48,9 @@ class CategoryViewSet(ModelViewSet):
         return Response(serializer.data, 200)
     
     def perform_destroy(self, instance):
-        
+        """
+        카테고리 삭제 시, 하위(자식) 카테고리를 삭제한 카테고리의 상위(부모) 카테고리의 자식 카테고리로 입양시킵니다.
+        """
         if instance.created_user != self.request.user:
             return Response("삭제 권한이 없습니다.", 403)
         
@@ -60,9 +62,6 @@ class CategoryViewSet(ModelViewSet):
             child.save()
         
         instance.delete()
-        # return super().perform_destroy(instance)
-
-
 
 
 article_list = ArticleViewSet.as_view({
