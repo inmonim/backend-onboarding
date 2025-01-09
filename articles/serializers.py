@@ -4,7 +4,6 @@ from users.serializers import UserSerializer
 from .models import Article, Category
 
 class ArticleSerializer(ModelSerializer):
-    author = UserSerializer()
     
     class Meta:
         model = Article
@@ -16,8 +15,12 @@ class ArticleSerializer(ModelSerializer):
             'is_deleted',
             'created_at',
             'updated_at',
-            'category_id',
+            'category',
+            'author',
         )
+        extra_kwargs = {
+            'author' : {"read_only" : True}
+        }
         
 class CategorySerializer(ModelSerializer):
     

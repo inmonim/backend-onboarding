@@ -1,14 +1,60 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Article, Category
 from .serializers import ArticleSerializer, CategorySerializer
 
+
 class ArticleViewSet(ModelViewSet):
-    
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    def get_permissions(self):
+        if self.action in ['list']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def get_queryset(self):
+        """
+        리스트 조회 시 is_public과 author 조건에 따라 데이터 필터링.
+        """
+        user = self.request.user  # 현재 요청의 사용자
+        if user.is_authenticated:
+            # 로그인된 사용자: 자신이 작성한 글 + 공개된 글만 필터링
+            return Article.objects.filter(is_public=1) | Article.objects.filter(author=user)
+        else:
+            # 로그인되지 않은 사용자: 공개된 글만 필터링
+            return Article.objects.filter(is_public=1)
+        
+    def perform_create(self, serializer):
+        category = serializer.validated_data.get('category')
+        is_public = serializer.validated_data.get('is_public')
+        
+        if not (category.is_public or (category.created_user.id == self.request.user.id)):
+            return Response("해당 카테고리에 대한 접근 권한이 없음", 403)
+
+        if is_public is None:
+            if category:
+                is_public = category.is_public
+            else:
+                is_public = 1
+
+        serializer.save(author=self.request.user, is_public=is_public)
+    
+class ArticleDetailViewSet(ModelViewSet):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    
+    def get_permissions(self):
+        if self.action == 'retrieve':
+            return [AllowAny()]
+        return [IsAuthenticated()]
+    
+    def perform_destroy(self, instance):
+        if self.request.user.id != instance.author.id:
+            return Response("해당 게시물에 대한 접근 권한 없음", 403)
+        instance.is_deleted = 1
+        instance.save()
 
 
 class CategoryViewSet(ModelViewSet):
@@ -64,12 +110,14 @@ class CategoryViewSet(ModelViewSet):
         instance.delete()
 
 
-article_list = ArticleViewSet.as_view({
-    'get' : 'list'
+aritcle_detail_view_set = ArticleDetailViewSet.as_view({
+    'get' : 'retrieve',
+    'delete' : 'destroy'
 })
 
-aritcle_detail = ArticleViewSet.as_view({
-    'get' : 'retrieve'
+article_view_set = ArticleViewSet.as_view({
+    'post' : 'create',
+    'get' : 'list'
 })
 
 category_view_set = CategoryViewSet.as_view({
