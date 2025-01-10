@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
@@ -81,7 +82,7 @@ class ArticleViewSet(ModelViewSet):
         
         if category:
             if not (category.is_public or (category.created_user.id == self.request.user.id)):
-                return Response("해당 카테고리에 대한 접근 권한이 없음", 403)
+                raise PermissionDenied("해당 카테고리에 대한 접근 권한이 없음", 403)
 
         if is_public is None:
             if category:
@@ -118,7 +119,7 @@ class ArticleDetailViewSet(ModelViewSet):
     
     def perform_destroy(self, instance):
         if self.request.user.id != instance.author.id:
-            return Response("해당 게시물에 대한 접근 권한 없음", 403)
+            raise PermissionDenied("해당 게시물에 대한 접근 권한 없음", 403)
         instance.is_deleted = 1
         instance.save()
 
@@ -137,7 +138,7 @@ class ArticleDetailViewSet(ModelViewSet):
     def perform_update(self, serializer):
         old_article = serializer.instance
         if self.request.user != old_article.author:
-            return Response("수정 권한이 없습니다.", 403)
+            raise PermissionDenied("수정 권한이 없습니다.", 403)
         serializer.save()
 
 class CategoryViewSet(ModelViewSet):
@@ -182,7 +183,7 @@ class CategoryViewSet(ModelViewSet):
         """
         user = self.request.user
         if instance.created_user != user:
-            return Response("삭제 권한이 없습니다.", 403)
+            raise PermissionDenied("삭제 권한이 없습니다.", 403)
         
         # 레거시 코드
         # ===============
