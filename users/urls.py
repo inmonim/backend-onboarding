@@ -10,8 +10,8 @@ app_name = "users"
 
 urlpatterns = [
     path("", user_view_set),
-    path("login/", login_view),
-    path("logout/", logout_view),
-    path("change-password/", user_password_change_view_set),
-    path("refresh/", refresh_view),
+    path("login/", login_view, name="user_login"),
+    path("logout/", logout_view, name="user_out"),
+    path("change-password/", user_password_change_view_set, name="change_password"),
+    path("refresh/", refresh_view, name="token_refresh"),
 ]
