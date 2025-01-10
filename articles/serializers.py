@@ -15,8 +15,8 @@ class CategoryNameSerializer(ModelSerializer):
         fields = ['category_id', 'category_name']
 
 class ArticleSerializer(ModelSerializer):
-    category = CategoryNameSerializer()
-    author = UserNameSerializer()
+    category = CategoryNameSerializer(read_only=True)
+    author = UserNameSerializer(read_only=True)
     
     class Meta:
         model = Article
@@ -32,7 +32,8 @@ class ArticleSerializer(ModelSerializer):
             'author',
         )
         extra_kwargs = {
-            'author' : {"read_only" : True}
+            'author' : {"read_only" : True},
+            'category' : {"read_only" : True}
         }
         
 class CategorySerializer(ModelSerializer):

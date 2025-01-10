@@ -122,6 +122,23 @@ class ArticleDetailViewSet(ModelViewSet):
         instance.is_deleted = 1
         instance.save()
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        if instance.is_deleted:
+            return Response("삭제된 게시물", 410)
+        
+        if not (instance.is_public or (self.request.user == instance.author)):
+            return Response("비공개 게시물", 403)
+        
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        old_article = serializer.instance
+        if self.request.user != old_article.author:
+            return Response("수정 권한이 없습니다.", 403)
+        serializer.save()
 
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.all()
@@ -184,7 +201,8 @@ class CategoryViewSet(ModelViewSet):
 
 aritcle_detail_view_set = ArticleDetailViewSet.as_view({
     'get' : 'retrieve',
-    'delete' : 'destroy'
+    'delete' : 'destroy',
+    'put' : 'update'
 })
 
 article_view_set = ArticleViewSet.as_view({
