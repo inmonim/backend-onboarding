@@ -3,5 +3,5 @@ from .views import comment, comment_detail
 
 urlpatterns = [
     path('', comment),
-    path('<int:comment_id>', comment_detail)
+    path('<int:pk>/', comment_detail)
 ]

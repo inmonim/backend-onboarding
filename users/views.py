@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView, TokenBlacklistView
@@ -26,7 +27,7 @@ class UserViewSet(ModelViewSet):
     def perform_destroy(self, instance):
         user = instance
         if not user:
-            return Response("유저를 찾을 수 없음", 404)
+            raise PermissionDenied("유저를 찾을 수 없음", 404)
         user.is_active = False
         user.save()
         
@@ -43,7 +44,7 @@ class LoginView(APIView):
     def post(self, request, *args, **kwargs):
         # 이미 로그인 한 사용자일 경우 반려
         if request.user.is_authenticated:
-            return Response("이미 로그인한 사용자", 403)
+            raise PermissionDenied("이미 로그인한 사용자", 403)
         
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -77,9 +78,3 @@ login_view = LoginView.as_view()
 logout_view = TokenBlacklistView.as_view()
 
 refresh_view = TokenRefreshView.as_view()
-
-class ProtectView(APIView):
-    permission_classes = [IsAuthenticated]    
-    def get(self, request):
-        return Response("토큰 검증 성공", 200)
-protect_view = ProtectView.as_view()

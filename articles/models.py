@@ -27,7 +27,7 @@ class Category(BaseModel):
     class Meta:
         db_table = 'categories'
 
-    def get_parent_categories(self) -> tuple[T]:
+    def get_parent_categories(self) -> list[T]:
         """
         특정 카테고리의 모든 상위 카테고리를 검색하여 반환합니다.
         Django ORM을 통해 재귀적으로 쿼리를 보내는 것보다, 네이티브 쿼리를 활용하는 것이 네트워크 I/O를 줄일 수 있습니다.
@@ -55,9 +55,9 @@ class Category(BaseModel):
         with connection.cursor() as cursor:
             cursor.execute(query, [self.category_id])
             rows = cursor.fetchall()
-            return self.convert_to_model_instances(rows)
+            return self._convert_to_model_instances(rows)
 
-    def get_child_categories(self) -> tuple[T]:
+    def get_child_categories(self) -> list[T]:
         query = """
             WITH RECURSIVE child_tree AS (
                 SELECT category_id, category_name, parent_id, is_public, created_user_id
@@ -73,9 +73,9 @@ class Category(BaseModel):
         with connection.cursor() as cursor:
             cursor.execute(query, [self.category_id])
             rows = cursor.fetchall()
-            return self.convert_to_model_instances(rows)
+            return self._convert_to_model_instances(rows)
     
-    def convert_to_model_instances(self, raw_data : tuple[dict]) -> list[T]:
+    def _convert_to_model_instances(self, raw_data : tuple[dict]) -> list[T]:
         """
         native query로 반환받은 tuple[dict] 형태의 객체를 Category 인스턴스로 변환하여 반환합니다.
         
@@ -114,6 +114,7 @@ class Article(BaseModel):
     category = models.ForeignKey(Category,
                                  on_delete=models.SET_NULL,
                                  null=True,
+                                 blank=True,
                                  related_name='articles')
     
     class Meta:
