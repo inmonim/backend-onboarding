@@ -11,9 +11,9 @@ app_name = "users"
 
 urlpatterns = [
     path("", user_view_set),
-    path("login", login_view),
-    path("logout", logout_view),
-    path("change-password", user_password_change_view_set),
-    path("refresh", refresh_view),
-    path("protect", protect_view)
+    path("login/", login_view),
+    path("logout/", logout_view),
+    path("change-password/", user_password_change_view_set),
+    path("refresh/", refresh_view),
+    path("protect/", protect_view)
 ]
