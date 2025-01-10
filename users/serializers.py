@@ -10,6 +10,11 @@ from .models import User
 
 tz = pytz.timezone('UTC')
 
+class UserNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'nickname']
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

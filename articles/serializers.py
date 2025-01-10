@@ -1,13 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
-from users.serializers import UserSerializer
+from users.serializers import UserNameSerializer
 from .models import Article, Category
-from users.models import User
-
-class UserNameSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'nickname']
 
 class CategoryNameSerializer(ModelSerializer):
     class Meta:
