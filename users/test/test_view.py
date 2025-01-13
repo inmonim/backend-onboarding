@@ -27,18 +27,16 @@ class TestUsersView:
     # 유저 생성 테스트
     @pytest.mark.django_db
     def test_user_created(self, client):
-        nickname = "테스터"
-        username = "test_username"
-        password = "test_user_password123!@"
+        user = UserFactory.build()
         
         url = reverse("users:user_crud")
         
-        response = client.post(url, {'nickname':nickname, 'username':username, 'password':password})
+        response = client.post(url, {'nickname':user.nickname, 'username':user.username, 'password':user.password})
         
         assert response.status_code == 201
         assert response.data['last_login'] == None
         
-        duplicate_response = client.post(url, {'nickname': nickname, 'username': username, 'password': password})
+        duplicate_response = client.post(url, {'nickname': user.nickname, 'username': user.username, 'password': user.password})
         
         assert duplicate_response.data['username'][0].code == 'unique'
 

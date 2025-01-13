@@ -11,23 +11,22 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('articles', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Comment',
+            name='Category',
             fields=[
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='생성일자')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='수정일자')),
-                ('comment_id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('comment', models.CharField(max_length=1024)),
-                ('is_deleted', models.SmallIntegerField(default=0)),
-                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='articles.article')),
-                ('author', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='comments', to=settings.AUTH_USER_MODEL)),
+                ('category_id', models.BigAutoField(primary_key=True, serialize=False)),
+                ('category_name', models.CharField(max_length=50)),
+                ('is_public', models.SmallIntegerField(default=1)),
+                ('created_user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='created_category', to=settings.AUTH_USER_MODEL)),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='categories.category')),
             ],
             options={
-                'db_table': 'comments',
+                'db_table': 'categories',
             },
         ),
     ]
