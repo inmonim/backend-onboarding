@@ -18,8 +18,9 @@ class UserNameSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['nickname', 'username', 'password', 'last_login']
+        fields = ['id', 'nickname', 'username', 'password', 'last_login']
         extra_kwargs = {
+            'id' : {'read_only' : True},
             'username': {'write_only': True},
             'password': {'write_only': True},
             'last_login': {'read_only': True}}
@@ -67,7 +68,6 @@ class UserPasswordChagneSerializer(serializers.ModelSerializer):
         return instance
 
 class LoginSerializer(TokenObtainPairSerializer):
-        
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     refresh_token = serializers.CharField(read_only=True)
@@ -93,6 +93,7 @@ class LoginSerializer(TokenObtainPairSerializer):
         refresh = RefreshToken.for_user(user)
         
         res = {
+            'id' : user.id,
             'refresh_token' : str(refresh),
             'access_token' : str(refresh.access_token),
             'nickname' : user.nickname,
