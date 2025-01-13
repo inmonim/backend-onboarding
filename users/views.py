@@ -49,17 +49,6 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, 200)
-    
-    
-# class LogoutView(APIView):
-#     def post(self, request):
-#         try:
-#             refresh_token = request.data['refresh']
-#             token = RefreshToken(refresh_token)
-#             token.blacklist()
-#             return Response('유효하지 않은 토큰', 401)
-#         except Exception as e:
-#             return Response('유효하지 않은 토큰', 401)
 
 
 user_view_set = UserViewSet.as_view({

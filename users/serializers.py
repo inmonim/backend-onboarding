@@ -85,10 +85,10 @@ class LoginSerializer(TokenObtainPairSerializer):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
+            raise serializers.ValidationError("아이디가 틀렸습니다.", 404)
 
         if not check_password(password, user.password):
-            raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
+            raise serializers.ValidationError("비밀번호가 틀렸습니다.", 404)
         
         refresh = RefreshToken.for_user(user)
         

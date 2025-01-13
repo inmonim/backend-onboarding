@@ -1,4 +1,5 @@
 import factory.django
+from django.contrib.auth.hashers import make_password
 
 from users.models import User
 
@@ -10,6 +11,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = User
     
-    nickname = faker.name()
-    username = faker.uuid4()
-    password = faker.password()
+    nickname = factory.LazyAttribute(lambda _: faker.name())
+    username = factory.LazyAttribute(lambda _: faker.uuid4())
+    password = factory.LazyAttribute(lambda _: make_password(faker.password()))
