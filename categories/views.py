@@ -23,7 +23,7 @@ class CategoryViewSet(ModelViewSet):
             - path param:
                 - <int:pk> : 기준이 되는 지정 카테고리 id
             - query param:
-                - type=parent: 부모 카테고리 목록 반환
+                - type=parents: 부모 카테고리 목록 반환
                 - type=children: 자식 카테고리 목록 반환
                 - type 미지정: 현재 카테고리 반환
         
@@ -47,7 +47,7 @@ class CategoryViewSet(ModelViewSet):
         카테고리 삭제 시, 하위(자식) 카테고리를 삭제한 카테고리의 상위(부모) 카테고리의 자식 카테고리로 입양시킵니다.
         """
         user = self.request.user
-        if instance.created_user != user:
+        if instance.created_user and instance.created_user != user:
             raise PermissionDenied("삭제 권한이 없습니다.", 403)
         
         parent = instance.parent
