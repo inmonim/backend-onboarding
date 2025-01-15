@@ -18,8 +18,9 @@ class UserNameSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['nickname', 'username', 'password', 'last_login']
+        fields = ['id', 'nickname', 'username', 'password', 'last_login']
         extra_kwargs = {
+            'id' : {'read_only' : True},
             'username': {'write_only': True},
             'password': {'write_only': True},
             'last_login': {'read_only': True}}
@@ -67,7 +68,6 @@ class UserPasswordChagneSerializer(serializers.ModelSerializer):
         return instance
 
 class LoginSerializer(TokenObtainPairSerializer):
-        
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
     refresh_token = serializers.CharField(read_only=True)
@@ -85,14 +85,15 @@ class LoginSerializer(TokenObtainPairSerializer):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
+            raise serializers.ValidationError("아이디가 틀렸습니다.", 404)
 
         if not check_password(password, user.password):
-            raise serializers.ValidationError("비밀번호 또는 아이디가 틀렸습니다.", 404)
+            raise serializers.ValidationError("비밀번호가 틀렸습니다.", 404)
         
         refresh = RefreshToken.for_user(user)
         
         res = {
+            'id' : user.id,
             'refresh_token' : str(refresh),
             'access_token' : str(refresh.access_token),
             'nickname' : user.nickname,

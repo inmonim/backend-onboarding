@@ -30,21 +30,22 @@ SECRET_KEY = 'django-insecure-%@%#&)k60^5z2q+1ki)-+)kj=5u$+!5!_bu72(4q2q)iaei&$5
 # Application definition
 
 INSTALLED_APPS = [
-    'users',
-    'articles',
-    'comments',
-    'common',
-   
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
- 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+   
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+
+    'users',
+    'articles',
+    'categories',
+    'comments',
+    'common',
 ]
 
 MIDDLEWARE = [
