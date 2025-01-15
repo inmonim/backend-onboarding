@@ -98,14 +98,14 @@ class TestCommentView:
         
         assert response.status_code == 204
         
-        # 삭제한 코멘트 내용을 변형하여 받기
+        # 삭제된 코멘트는 내용을 변경하여 반환
         deleted_url = reverse('comments:comment_crud', kwargs={
             "article_id" : article.article_id
         })
         
         deleted_resposne = client.get(deleted_url)
         
-        assert deleted_resposne.data['comment'][0] == "삭제된 코멘트입니다"
+        assert deleted_resposne.data[0]['comment'] == "삭제된 코멘트입니다"
         
         # 다른 유저의 코멘트 삭제 시도
         another_user = UserFactory()

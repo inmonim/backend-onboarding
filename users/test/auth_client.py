@@ -29,12 +29,6 @@ def authenticated_client(get_token):
     return client
 
 @pytest.fixture
-def authenticated_client_and_id(get_token):
-    client = APIClient()
-    client.credentials(HTTP_AUTHORIZATION=f"Bearer {get_token['access_token']}")
-    return client, get_token['id']
-
-@pytest.fixture
 def authenticated_client_and_user(get_token):
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {get_token['access_token']}")
